@@ -1,11 +1,10 @@
-
 const tbody = document.querySelector('tbody');
-const addForm = document.querySelector('.add-form')
+const addForm = document.querySelector('.add-form');
 const inputTask = document.querySelector('.input-task');
 
 const fetchTasks = async () => {
-    const response = await fetch('http://localhost:3333/tasks');
-    const tasks = await response.json();
+    const response = await fetch('http://localhost:3333/tasks')
+    const tasks = await response.json()
     return tasks;
 }
 
@@ -20,41 +19,47 @@ const addTask = async (event) => {
         body: JSON.stringify(task),
     });
 
-    inputTask.value = "";
-    loadTasks()
+
+    loadTasks();
+    inputTask.value = '';
 }
 
 const deleteTask = async (id) => {
     await fetch(`http://localhost:3333/tasks/${id}`, {
-        method: 'delete'
+        method: 'delete',
     });
+
     loadTasks();
 }
 
 const updateTask = async ({ id, title, status }) => {
+
     await fetch(`http://localhost:3333/tasks/${id}`, {
         method: 'put',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, status })
+        body: JSON.stringify({ title, status }),
     });
+
     loadTasks();
 }
 
+
+
 const formatDate = (dateUTC) => {
-    const options = { dateStyle: 'short', timeStyle: 'short' }
+    const options = { dateStyle: 'long', timeStyle: 'short' };
     const date = new Date(dateUTC).toLocaleString('pt-br', options);
     return date;
 }
 
-const createElement = (tag, innerText = "", innerHTML = '') => {
-    const element = document.createElement(tag)
-    if (innerText) {
+const createElement = (tag, innerText = '', innerHTML = '') => {
+    const element = document.createElement(tag);
 
-        element.innerText = innerText
+    if (innerText) {
+        element.innerText = innerText;
     }
 
     if (innerHTML) {
-        element.innerHTML = innerHTML
+        element.innerHTML = innerHTML;
     }
 
     return element;
@@ -62,14 +67,16 @@ const createElement = (tag, innerText = "", innerHTML = '') => {
 
 const createSelect = (value) => {
     const options = `
- <option value="pendente">pendente</option>
- <option value="em andamento">em andamento</option>
- <option value="concluida">concluida</option>
- `
-    const select = createElement('select', "", options)
+    <option value="pendente">pendente</option>
+    <option value="em andamento">em andamento</option>
+    <option value="concluída">concluída</option>
+  `;
 
-    select.value = value
-    return select
+    const select = createElement('select', '', options);
+
+    select.value = value;
+
+    return select;
 }
 
 const createRow = (task) => {
@@ -84,12 +91,13 @@ const createRow = (task) => {
 
     const select = createSelect(status);
 
-    select.addEventListener('change', ({ target }) => {
-        updateTask({ ...task, status: target.value })
-    })
+    select.addEventListener('change', ({ target }) => updateTask({ ...task, status: target.value }));
 
-    const editForm = createElement('form')
-    const editInput = createElement('input')
+    const editButton = createElement('button', '', '<span class="material-symbols-outlined">edit</span>');
+    const deleteButton = createElement('button', '', '<span class="material-symbols-outlined">delete</span>');
+
+    const editForm = createElement('form');
+    const editInput = createElement('input');
 
     editInput.value = title;
     editForm.appendChild(editInput);
@@ -97,22 +105,18 @@ const createRow = (task) => {
     editForm.addEventListener('submit', (event) => {
         event.preventDefault();
 
-        updateTask({ id, title: editInput.value, status })
-    })
-
-
-
-    const editButton = createElement('button', '', '<span class="material-symbols-outlined"> edit </span>');
-    const deleteButton = createElement('button', '', '<span class="material-symbols-outlined"> delete </span>');
-    editButton.classList.add("btn-action");
-    deleteButton.classList.add("btn-action");
+        updateTask({ id, title: editInput.value, status });
+    });
 
     editButton.addEventListener('click', () => {
         tdTitle.innerText = '';
         tdTitle.appendChild(editForm);
-    })
+    });
 
-    deleteButton.addEventListener('click', () => deleteTask(id))
+    editButton.classList.add('btn-action');
+    deleteButton.classList.add('btn-action');
+
+    deleteButton.addEventListener('click', () => deleteTask(id));
 
     tdStatus.appendChild(select);
 
@@ -124,20 +128,21 @@ const createRow = (task) => {
     tr.appendChild(tdStatus);
     tr.appendChild(tdActions);
 
-    return tr
+    return tr;
 }
 
 const loadTasks = async () => {
-    const tasks = await fetchTasks()
+    const tasks = await fetchTasks();
 
-    tbody.innerHTML = ""
+    tbody.innerHTML = '';
 
     tasks.forEach((task) => {
-        const tr = createRow(task)
-        tbody.appendChild(tr)
+        const tr = createRow(task);
+        tbody.appendChild(tr);
     });
 }
 
+
 addForm.addEventListener('submit', addTask);
 
-loadTasks()
+loadTasks();
